@@ -85,7 +85,9 @@ echo $content;
         var id = $(this).offsetParent().offsetParent().offsetParent().attr("id");
         id = id.split("_");
         id = id[2];
-        link = "http://webgiamgia.net/vn?cid=" + id;
+        link_goc = "<?php echo $request_url ?>";
+        link_goc = link_goc.split("?");
+        link = "http://webgiamgia.net" + link_goc[0] + "?cid=" + id;
         window.location.href = link;
         window.open("http://webgiamgia.net/getLastLink.php?id=" + id, "_blank");
     });
@@ -94,11 +96,12 @@ echo $content;
         var id = $(this).offsetParent().offsetParent().offsetParent().offsetParent().attr("id");
         id = id.split("_");
         id = id[2];
-        link = "http://webgiamgia.net/vn?cid=" + id;
+        link_goc = "<?php echo $request_url ?>";
+        link_goc = link_goc.split("?");
+        link = "http://webgiamgia.net" + link_goc[0] + "?cid=" + id;
         window.location.href = link;
         window.open("http://webgiamgia.net/getLastLink.php?id=" + id, "_blank");
     })
-
 </script>
 <?php
 if ($request_url == '/vn/top') {
