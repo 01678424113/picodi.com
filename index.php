@@ -3,8 +3,10 @@ include "getLastLink.php";
 $request = $_SERVER['REQUEST_URI'];
 
 $check_link = explode('/', $request);
+
 if (count($check_link) > 0 && $check_link[1] == 'COut') {
-    $url = getLastLink($request);
+    $request_new = 'https://www.collectoffers.com/th'.$request;
+    $url = getLastLink($request_new);
     echo $url;
     die;
 }
@@ -86,9 +88,27 @@ $content = str_replace('/th/COut/', 'http://webgiamgia.net/COut/', $content);
 $content = str_replace('/th', 'https://www.collectoffers.com/th', $content);
 $content = str_replace('img src="', 'img src="https://www.collectoffers.com/th/', $content);
 $content = str_replace('a href="https://www.collectoffers.com/th/', 'a href="http://webgiamgia.net/', $content);
-$content = str_replace('<a class="" href="https://www.collectoffers.com/th', '<a href="http://webgiamgia.net/', $content);
+$content = str_replace('<a class="" href="https://www.collectoffers.com/th', '<a href="http://webgiamgia.net', $content);
 $content = str_replace('<a class="btn btn-offers btn-big" target="_blank" rel="nofollow" href="https://www.collectoffers.com/th/', '<a class="btn btn-offers btn-big" target="_blank" rel="nofollow" href="http://webgiamgia.net/', $content);
-$content = str_replace('<li><a href="http://webgiamgia.net/deals/on+sale/-/co-o1">On Sale</a></li>', '', $content);
+$content = str_replace('https://www.collectoffers.com/th/deals', 'http://webgiamgia.net/deals', $content);
+
+preg_match_all('/https\:\/\/clk.omgt3.com(.*?)\"/',$content,$link_tracks);
+if(count($link_tracks) > 0){
+    foreach ($link_tracks as $link_track){
+        $link_track = str_replace('"','',$link_track);
+        $link_track_new = getLastLink($link_track);
+        $content = str_replace($link_track,$link_track_new,$content);
+    }
+}
+preg_match_all('/http://invol.co/aff(.*?)\"/',$content,$link_tracks);
+if(count($link_tracks) > 0){
+    foreach ($link_tracks as $link_track){
+        $link_track = str_replace('"','',$link_track);
+        $link_track_new = getLastLink($link_track);
+        $content = str_replace($link_track,$link_track_new,$content);
+    }
+}
+
 
 echo $content;
 ?>

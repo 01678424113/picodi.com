@@ -1,7 +1,7 @@
 <?php
 function getLastLink($url)
 {
-    $header = get_headers('https://www.collectoffers.com/th'.$url);
+    $header = get_headers($url);
     $header = implode(" ", $header);
     $location = preg_match('/Location\:.*?\&url=(.*?)\s/', $header, $result);
     if(count($result) == 0){
@@ -14,11 +14,17 @@ function getLastLink($url)
     $last_link = str_replace("%2f", "/", $last_link);
     return $last_link;
 }
-
 ?>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
+    $(document).ready(function () {
+        $('.flag').hide();
+        $('.signup-nav').hide();
+        $('.merchant-info-sidebar').hide();
+        $('.extension').hide();
+    })
 
 </script>
 
