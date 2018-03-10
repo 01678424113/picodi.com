@@ -1,130 +1,115 @@
 <?php
 include "getLastLink.php";
+
+
+class cURL
+{
+    var $headers;
+    var $user_agent;
+    var $compression;
+    var $cookie_file;
+    var $proxy;
+
+    function cURL($cookies = TRUE, $cookie = 'cook.txt', $compression = 'gzip', $proxy = '')
+    {
+        $this->headers[] = 'Accept: image/gif, image/x-bitmap, image/jpeg, image/pjpeg';
+        $this->headers[] = 'Connection: Keep-Alive';
+        $this->headers[] = 'Content-type: application/x-www-form-urlencoded;charset=UTF-8';
+        $this->user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0';
+// $this->user_agent = 'Mozilla/5.0 (Linux; Android 7.0; SM-G935P Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.92 Mobile Safari/537.36';
+        $this->compression = $compression;
+        $this->proxy = $proxy;
+        $this->cookies = $cookies;
+        if ($this->cookies == TRUE) $this->cookie($cookie);
+    }
+
+    function user_agent($user_agent)
+    {
+        $this->user_agent = $user_agent;
+    }
+
+    function cookie($cookie_file)
+    {
+        global $rootpath;
+        if (file_exists($cookie_file)) {
+            $this->cookie_file = $cookie_file;
+        } else {
+            $this->cookie_file = $cookie_file;
+        }
+    }
+
+    function ref($url)
+    {
+        $this->referer = $url;
+    }
+
+    function get($url)
+    {
+        global $rootpath;
+        $process = curl_init($url);
+        curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
+        curl_setopt($process, CURLOPT_HEADER, 0);
+        curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
+        if (!file_exists($this->cookie_file)) {
+            @fopen($this->cookie_file, 'w');
+            @fclose($this->cookie_file);
+        }
+        if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
+        if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
+        if ($this->referer == TRUE) curl_setopt($process, CURLOPT_REFERER, $this->referer);
+        curl_setopt($process, CURLOPT_ENCODING, $this->compression);
+        curl_setopt($process, CURLOPT_TIMEOUT, 3000);
+//if ($this->proxy) curl_setopt($cUrl, CURLOPT_PROXY, ‘proxy_ip:proxy_port’);
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
+//curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);
+        $return = curl_exec($process);
+        curl_close($process);
+        return $return;
+    }
+
+    function post($url, $data)
+    {
+        $process = curl_init($url);
+        curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
+        curl_setopt($process, CURLOPT_HEADER, 1);
+        curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
+        if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
+        if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
+        if ($this->referer == TRUE) curl_setopt($process, CURLOPT_REFERER, $this->referer);
+        curl_setopt($process, CURLOPT_ENCODING, $this->compression);
+        curl_setopt($process, CURLOPT_TIMEOUT, 30);
+        if ($this->proxy) curl_setopt($process, CURLOPT_PROXY, $this->proxy);
+        curl_setopt($process, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
+//curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($process, CURLOPT_POST, 1);
+        $return = curl_exec($process);
+        curl_close($process);
+        return $return;
+    }
+
+    function error($error)
+    {
+        echo "<center><div style='width:500px;border: 3px solid #FFEEFF; padding: 3px; background-color: #FFDDFF;font-family: verdana; font-size: 10px'><b>cURL Error</b><br>$error</div></center>";
+        die;
+    }
+}
+
 $request = $_SERVER['REQUEST_URI'];
+$cc = new cURL();
 
-$check_link = explode('/', $request);
+$link = 'https://ipricethailand.com'.$request;
+$html = $cc->get($link);
 
-if (count($check_link) > 0 && $check_link[1] == 'COut') {
-    $request_new = 'https://www.collectoffers.com/th'.$request;
-    $url = getLastLink($request_new);
-    echo $url;
+preg_match('/\/r\/pc\/\?\_id\=(.*?)$/',$request,$check);
+if(count($check) == 2){
+    $link = 'https://ipricethailand.com'.$check[0];
+    $link_new = getLastLink($link);
+    echo $link_new;
     die;
 }
+$html = str_replace('','',$html);
+$html = str_replace('https://ipricethailand.com','http://webgiamgia.net',$html);
+echo $html;
 
-if ($request == '/') {
-    $content = file_get_contents('https://www.collectoffers.com/th');
-    $link_presents = preg_match_all('/href\=\"javascript\:void\(0\)\;\".*?onclick=\"return ShowOfferInPopUp.*?\/th\/(.*?)\&R\=.*?\"/', $content, $result_2);
-    $link_presents = $result_2[0];
-    $ids = $result_2[1];
-
-    $i = 0;
-    foreach ($link_presents as $link_present) {
-        $link_change = 'href="http://webgiamgia.net/' . $ids[$i] . '""';
-        $content = str_replace($link_present, $link_change, $content);
-        $i++;
-    }
-} else {
-    $content = file_get_contents('https://www.collectoffers.com/th' . $request);
-    if (empty($content)) {
-        $content = file_get_contents('https://www.collectoffers.com/th');
-        $link_presents = preg_match_all('/href\=\"javascript\:void\(0\)\;\".*?onclick=\"return ShowOfferInPopUp.*?\/th\/(.*?)\&R\=.*?\"/', $content, $result_2);
-        $link_presents = $result_2[0];
-        $ids = $result_2[1];
-
-        $i = 0;
-        foreach ($link_presents as $link_present) {
-            $link_change = 'href="http://webgiamgia.net/' . $ids[$i] . '""';
-            $content = str_replace($link_present, $link_change, $content);
-            $i++;
-        }
-    } else {
-        $link_changes = preg_match_all('/onclick=\"return ViewVoucherCodePopUp(.*?)th.*?\"/', $content, $result_2);
-        $link_changes = array_unique($result_2[1]);
-        $link = [];
-        foreach ($link_changes as $link_change) {
-            $link_change = explode(',',$link_change);
-
-            if (count($link_change) > 1) {
-                $o = str_replace(['#39;','(','&'],'',$link_change[0]);
-                $m = str_replace(['#39;','(','&'],'',$link_change[2]);
-                $lin = '<a href="/th/COut/?M='.$m.'&O='.$o.'"';
-                $link[] = $lin;
-            }
-        };
-
-
-        $link_fulls = preg_match_all('/<a.*?id=\"(.*?)\".*?onclick=\"return ViewVoucherCodePopUp(.*?)th.*?\"/', $content, $result_1);
-
-        $link_fulls = array_unique($result_1[0]);
-        $ids = array_unique($result_1[1]);
-
-        $i = 0;
-        foreach ($link_fulls as $link_full) {
-            $j = $i / 3;
-            $j = intval($j);
-            if ($i % 3 == 0) {
-                $link_new = $link[$j] . ' id="' . $ids[$i] . '"';
-            } elseif ($i % 3 == 1) {
-                $link_new = $link[$j] . ' id="' . $ids[$i] . '"' . ' class="btn btn-offers"';
-            } else {
-                $split = explode('&O=',$link[$j]);
-                $check_request = explode('?O=',$request);
-                if(count($check_request) > 0){
-                    $link_j = '<a href="http://webgiamgia.net'.$check_request[0].'?O='.$split[1].'"';
-                }else{
-                    $link_j = '<a href="http://webgiamgia.net'.$request.'?O='.$split[1].'"';
-                }
-                $link_new = $link_j . ' id="' . $ids[$i] . '"' . ' class="deal-button"';
-            }
-            $content = str_replace($link_full, $link_new, $content);
-            $i++;
-        }
-    }
-}
-
-
-$content = str_replace('https://www.collectoffers.com/th', 'http://webgiamgia.net/COut/', $content);
-$content = str_replace('/th/COut/', 'http://webgiamgia.net/COut/', $content);
-$content = str_replace('/th', 'https://www.collectoffers.com/th', $content);
-$content = str_replace('img src="', 'img src="https://www.collectoffers.com/th/', $content);
-$content = str_replace('a href="https://www.collectoffers.com/th/', 'a href="http://webgiamgia.net/', $content);
-$content = str_replace('<a class="" href="https://www.collectoffers.com/th', '<a href="http://webgiamgia.net', $content);
-$content = str_replace('<a class="btn btn-offers btn-big" target="_blank" rel="nofollow" href="https://www.collectoffers.com/th/', '<a class="btn btn-offers btn-big" target="_blank" rel="nofollow" href="http://webgiamgia.net/', $content);
-$content = str_replace('https://www.collectoffers.com/th/deals', 'http://webgiamgia.net/deals', $content);
-
-preg_match_all('/https\:\/\/clk.omgt3.com(.*?)\"/',$content,$link_tracks);
-if(count($link_tracks) > 0){
-    foreach ($link_tracks as $link_track){
-        $link_track = str_replace('"','',$link_track);
-        $link_track_new = getLastLink($link_track);
-        $content = str_replace($link_track,$link_track_new,$content);
-    }
-}
-preg_match_all('/http://invol.co/aff(.*?)\"/',$content,$link_tracks);
-if(count($link_tracks) > 0){
-    foreach ($link_tracks as $link_track){
-        $link_track = str_replace('"','',$link_track);
-        $link_track_new = getLastLink($link_track);
-        $content = str_replace($link_track,$link_track_new,$content);
-    }
-}
-
-
-echo $content;
 ?>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-    var btn_get_offer = $('a.btn-get-offer');
-    $.each(btn_get_offer, function (key, value) {
-        console.log(value);
-    });
-    $(document).ready(function () {
-
-    });
-    $('.merchant-share').css('display','none');
-    $('#ContentPlaceHolder*_RptMerchantOffers_ctlMerchantOffer*_*_SpnCodeCover_*').css('display','none');
-
-</script>
-
-
