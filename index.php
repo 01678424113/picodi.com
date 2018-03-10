@@ -106,14 +106,29 @@ if (count($check_link) > 1) {
     die;
 }
 
-$link = 'https://hanggiamgia.vn' . $request;
+$link = 'https://bloggiamgia.vn' . $request;
 $html = $cc->get($link);
-$html = str_replace('https://hanggiamgia.vn', 'http://webgiamgia.net', $html);
-$html = str_replace('http://webgiamgia.net/css', 'https://hanggiamgia.vn/css', $html);
-$html = str_replace('http://webgiamgia.net/js', 'https://hanggiamgia.vn/js', $html);
-$html = str_replace('http://webgiamgia.net/images', 'https://hanggiamgia.vn/images', $html);
 
-preg_match_all('/https\:\/\/hanggiamgia.vn\/direct\/\?data=(.*?)\"/', $html, $link_redirects);
+$check_link = explode('out',$request);
+if(count($check_link)>1){
+    $link_check = $link;
+    $last_link = getLastLink($link_check);
+    echo $last_link;
+    die;
+}
+
+$html = str_replace('https://bloggiamgia.vn','http://webgiamgia.net',$html);
+$html = str_replace('http://webgiamgia.net/wp-content/uploads','https://bloggiamgia.vn/wp-content/uploads',$html);
+$html = str_replace('http://webgiamgia.net/wp-content/plugins','https://bloggiamgia.vn/wp-content/plugins',$html);
+$html = str_replace('http://webgiamgia.net/wp-content/themes','https://bloggiamgia.vn/wp-content/themes',$html);
+
+$html = str_replace('users icon','fa fa-user',$html);
+$html = str_replace('facebook square icon','fa fa-tags',$html);
+$html = str_replace('shop icon','fa fa-shopping-bag',$html);
+$html = str_replace('smile icon','fa fa-ban',$html);
+$html = str_replace('frown icon','fa fa-heart',$html);
+$html = str_replace('empty star icon','fa fa-save',$html);
+
 
 ?>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
