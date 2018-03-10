@@ -1,19 +1,12 @@
 <?php
 function getLastLink($url)
 {
-    $header = get_headers($url);
-    $header = implode(" ", $header);
-    $location = preg_match('/Location\:.*?url\%3D(.*?)\%253Foffer\_id/', $header, $result);
-    if(count($result) == 0){
-        $location = preg_match('/Location\:.*?\&url=(.*?)\s/', $header, $result);
-    }
+    $get_last_link = file_get_contents($url);
+    preg_match('/.*?url\=(.*?)offer\_id/',$get_last_link,$result);
     $last_link = $result[1];
-    $last_link = str_replace("%253A", ":", $last_link);
-    $last_link = str_replace("%253a", ":", $last_link);
-    $last_link = str_replace("%252F", "/", $last_link);
-    $last_link = str_replace("%252f", "/", $last_link);
     return $last_link;
 }
+
 ?>
 
 

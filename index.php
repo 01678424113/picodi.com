@@ -98,18 +98,26 @@ class cURL
 $request = $_SERVER['REQUEST_URI'];
 $cc = new cURL();
 
-$link = 'https://ipricethailand.com'.$request;
-$html = $cc->get($link);
-
-preg_match('/\/r\/pc\/\?\_id\=(.*?)$/',$request,$check);
-if(count($check) == 2){
-    $link = 'https://ipricethailand.com'.$check[0];
-    $link_new = getLastLink($link);
-    echo $link_new;
+$check_link = explode('direct', $request);
+if (count($check_link) > 1) {
+    $link_check = 'https://hanggiamgia.vn' . $request;
+    $last_link = getLastLink($link_check);
+    echo $last_link;
     die;
 }
-$html = str_replace('','',$html);
-$html = str_replace('https://ipricethailand.com','http://webgiamgia.net',$html);
+
+$link = 'https://hanggiamgia.vn' . $request;
+$html = $cc->get($link);
+$html = str_replace('https://hanggiamgia.vn', 'http://webgiamgia.net', $html);
+$html = str_replace('http://webgiamgia.net/css', 'https://hanggiamgia.vn/css', $html);
+$html = str_replace('http://webgiamgia.net/js', 'https://hanggiamgia.vn/js', $html);
+$html = str_replace('http://webgiamgia.net/images', 'https://hanggiamgia.vn/images', $html);
+
+preg_match_all('/https\:\/\/hanggiamgia.vn\/direct\/\?data=(.*?)\"/', $html, $link_redirects);
+
+?>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<?php
 echo $html;
 
 ?>
