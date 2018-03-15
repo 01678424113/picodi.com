@@ -3,7 +3,10 @@ function getLastLink($url)
 {
     $header = get_headers($url);
     $header = implode(" ", $header);
-    $location = preg_match('/Location\:\s(.*?)\s/', $header, $result);
+    $location = preg_match('/Location\:.*?\&url=(.*?)\s/', $header, $result);
+    if(count($result) == 0){
+        $location = preg_match('/Location\:.*?\&r=(.*?)\s/', $header, $result);
+    }
     $last_link = $result[1];
     $last_link = str_replace("%3A", ":", $last_link);
     $last_link = str_replace("%3a", ":", $last_link);
@@ -17,8 +20,11 @@ function getLastLink($url)
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('.offer-widget').hide();
-        $('.wp-caption').hide();
+        $('.flag').hide();
+        $('.signup-nav').hide();
+        $('.merchant-info-sidebar').hide();
+        $('.extension').hide();
     })
+
 </script>
 
