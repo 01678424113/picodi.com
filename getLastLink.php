@@ -2,31 +2,34 @@
 function getLastLink($url)
 {
     $header = get_headers($url);
-
+    var_dump($header);
     $header = implode(" ", $header);
-    preg_match('/Location\:.*?url%3D(.*?)\%253F/', $header, $result);
-    if ($result[1] == ''){
-         preg_match('/Location\:.*?url%3D(.*?)\%26/', $header, $result);
+    preg_match('/Location\:\s.*?\&url=(.*?)\%3Fsource/', $header, $last_link);
+    $last_link = $last_link[1];
+    $last_link = str_replace("%3A", ":", $last_link);
+    $last_link = str_replace("%3a", ":", $last_link);
+    $last_link = str_replace("%2F", "/", $last_link);
+    $last_link = str_replace("%2f", "/", $last_link);
+    preg_match('/ho.lazada(.*?)/', $last_link, $result);
+    if (count($result) == 2) {
+        $header = get_headers($last_link);
+        $header = implode(" ", $header);
+        preg_match('/Location\:(.*?)\?offer\_id/', $header, $last_link_2);
+        $last_link = $last_link_2[1];
     }
-    $last_link = $result[1];
-
-    $last_link = str_replace("%253A", ":", $last_link);
-    $last_link = str_replace("%%253a", ":", $last_link);
-    $last_link = str_replace("%252F", "/", $last_link);
-    $last_link = str_replace("%252f", "/", $last_link);
     return $last_link;
 }
-?>
 
+?>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#bs-carousel5').hide();
-        $('.fb-like').hide();
-        $('.footer').hide();
-        $('.menu-2').hide();
-        $('img[src="https://image.excite.co.id/shop/images/banner-364x303.jpg"]').hide();
+        $('#links').hide();
+        $('#mega-menu-amp').hide();
+        $('#disclaimer').hide();
+        $('amp-facebook-like').hide();
+
     })
 </script>
 
